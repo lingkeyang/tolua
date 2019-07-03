@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2015-2016 topameng(topameng@qq.com)
+Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,10 +27,10 @@ namespace LuaInterface
 {
     public class LuaFunction : LuaBaseRef
     {
-        protected class FuncData
+        protected struct FuncData
         {
-            public int oldTop = -1;
-            public int stackPos = -1;
+            public int oldTop;
+            public int stackPos;
 
             public FuncData(int top, int stack)
             {
@@ -39,7 +39,7 @@ namespace LuaInterface
             }
         }
 
-        protected int oldTop = -1;        
+        protected int oldTop = -1;
         private int argCount = 0;
         private int stackPos = -1;
         private Stack<FuncData> stack = new Stack<FuncData>();
@@ -47,7 +47,7 @@ namespace LuaInterface
         public LuaFunction(int reference, LuaState state)
         {
             this.reference = reference;
-            this.luaState = state;            
+            this.luaState = state;
         }
 
         public override void Dispose()
@@ -55,11 +55,16 @@ namespace LuaInterface
 #if UNITY_EDITOR
             if (oldTop != -1 && count <= 1)
             {
-                Debugger.LogError("You muse call EndPCall before calling Dispose");
+                Debugger.LogError("You must call EndPCall before calling Dispose");
             }
 #endif
-                base.Dispose();
-            }
+            base.Dispose();
+        }
+
+        public T ToDelegate<T>() where T : class
+        {
+            return DelegateTraits<T>.Create(this) as T;
+        }
 
         public virtual int BeginPCall()
         {
@@ -90,11 +95,11 @@ namespace LuaInterface
             {
                 luaState.PCall(argCount, oldTop);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 EndPCall();
                 throw e;
-            }               
+            }
         }
 
         public void EndPCall()
@@ -105,18 +110,263 @@ namespace LuaInterface
                 argCount = 0;
                 FuncData data = stack.Pop();
                 oldTop = data.oldTop;
-                stackPos = data.stackPos;                
+                stackPos = data.stackPos;
             }
         }
 
         public void Call()
-        {            
+        {
             BeginPCall();
             PCall();
-            EndPCall();            
+            EndPCall();
         }
 
-        public object[] Call(params object[] args)
+        public void Call<T1>(T1 arg1)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PCall();
+            EndPCall();
+        }
+
+        public void Call<T1, T2>(T1 arg1, T2 arg2)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PCall();
+            EndPCall();
+        }
+
+        public void Call<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PCall();
+            EndPCall();
+        }
+
+        public void Call<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PCall();
+            EndPCall();
+        }
+
+        public void Call<T1, T2, T3, T4, T5>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PushGeneric(arg5);
+            PCall();
+            EndPCall();
+        }
+
+        public void Call<T1, T2, T3, T4, T5, T6>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PushGeneric(arg5);
+            PushGeneric(arg6);
+            PCall();
+            EndPCall();
+        }
+
+        public void Call<T1, T2, T3, T4, T5, T6, T7>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PushGeneric(arg5);
+            PushGeneric(arg6);
+            PushGeneric(arg7);
+            PCall();
+            EndPCall();
+        }
+
+        public void Call<T1, T2, T3, T4, T5, T6, T7, T8>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PushGeneric(arg5);
+            PushGeneric(arg6);
+            PushGeneric(arg7);
+            PushGeneric(arg8);
+            PCall();
+            EndPCall();
+        }
+
+        public void Call<T1, T2, T3, T4, T5, T6, T7, T8, T9>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PushGeneric(arg5);
+            PushGeneric(arg6);
+            PushGeneric(arg7);
+            PushGeneric(arg8);
+            PushGeneric(arg9);
+            PCall();
+            EndPCall();
+        }
+
+        public R1 Invoke<R1>()
+        {
+            BeginPCall();
+            PCall();
+            R1 ret1 = CheckValue<R1>();
+            EndPCall();
+            return ret1;
+        }
+
+        public R1 Invoke<T1, R1>(T1 arg1)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PCall();
+            R1 ret1 = CheckValue<R1>();
+            EndPCall();
+            return ret1;
+        }
+
+        public R1 Invoke<T1, T2, R1>(T1 arg1, T2 arg2)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PCall();
+            R1 ret1 = CheckValue<R1>();
+            EndPCall();
+            return ret1;
+        }
+
+        public R1 Invoke<T1, T2, T3, R1>(T1 arg1, T2 arg2, T3 arg3)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PCall();
+            R1 ret1 = CheckValue<R1>();
+            EndPCall();
+            return ret1;
+        }
+
+        public R1 Invoke<T1, T2, T3, T4, R1>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PCall();
+            R1 ret1 = CheckValue<R1>();
+            EndPCall();
+            return ret1;
+        }
+
+        public R1 Invoke<T1, T2, T3, T4, T5, R1>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PushGeneric(arg5);
+            PCall();
+            R1 ret1 = CheckValue<R1>();
+            EndPCall();
+            return ret1;
+        }
+
+        public R1 Invoke<T1, T2, T3, T4, T5, T6, R1>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PushGeneric(arg5);
+            PushGeneric(arg6);
+            PCall();
+            R1 ret1 = CheckValue<R1>();
+            EndPCall();
+            return ret1;
+        }
+
+        public R1 Invoke<T1, T2, T3, T4, T5, T6, T7, R1>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PushGeneric(arg5);
+            PushGeneric(arg6);
+            PushGeneric(arg7);
+            PCall();
+            R1 ret1 = CheckValue<R1>();
+            EndPCall();
+            return ret1;
+        }
+
+        public R1 Invoke<T1, T2, T3, T4, T5, T6, T7, T8, R1>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PushGeneric(arg5);
+            PushGeneric(arg6);
+            PushGeneric(arg7);
+            PushGeneric(arg8);
+            PCall();
+            R1 ret1 = CheckValue<R1>();
+            EndPCall();
+            return ret1;
+        }
+
+        public R1 Invoke<T1, T2, T3, T4, T5, T6, T7, T8, T9, R1>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
+        {
+            BeginPCall();
+            PushGeneric(arg1);
+            PushGeneric(arg2);
+            PushGeneric(arg3);
+            PushGeneric(arg4);
+            PushGeneric(arg5);
+            PushGeneric(arg6);
+            PushGeneric(arg7);
+            PushGeneric(arg8);
+            PushGeneric(arg9);            
+            PCall();
+            R1 ret1 = CheckValue<R1>();
+            EndPCall();
+            return ret1;
+        }
+
+        //慎用, 有gc alloc
+        [System.Obsolete("LuaFunction.LazyCall() is obsolete.Use LuaFunction.Invoke()")]
+        public object[] LazyCall(params object[] args)
         {
             BeginPCall();
             int count = args == null ? 0 : args.Length;
@@ -124,14 +374,19 @@ namespace LuaInterface
             if (!luaState.LuaCheckStack(count + 6))
             {
                 EndPCall();
-                throw new LuaException("stack overflow");                
+                throw new LuaException("stack overflow");
             }
-
+            
             PushArgs(args);
             PCall();
             object[] objs = luaState.CheckObjects(oldTop);
             EndPCall();
             return objs;
+        }
+
+        public void CheckStack(int args)
+        {
+            luaState.LuaCheckStack(args + 6);
         }
 
         public bool IsBegin()
@@ -145,9 +400,33 @@ namespace LuaInterface
             ++argCount;
         }
 
-        public void PushInt64(LuaInteger64 n64)
+        public void Push(int n)
         {
-            luaState.PushInt64(n64);
+            luaState.Push(n);
+            ++argCount;
+        }
+
+        public void PushLayerMask(LayerMask n)
+        {
+            luaState.PushLayerMask(n);
+            ++argCount;
+        }
+
+        public void Push(uint un)
+        {
+            luaState.Push(un);
+            ++argCount;
+        }
+
+        public void Push(long num)
+        {
+            luaState.Push(num);
+            ++argCount;
+        }
+
+        public void Push(ulong un)
+        {
+            luaState.Push(un);
             ++argCount;
         }
 
@@ -177,7 +456,7 @@ namespace LuaInterface
 
         public void Push(object o)
         {
-            luaState.Push(o);
+            luaState.PushVariant(o);
             ++argCount;
         }
 
@@ -235,12 +514,6 @@ namespace LuaInterface
             ++argCount;
         }
 
-        public void PushLayerMask(LayerMask mask)
-        {
-            luaState.PushLayerMask(mask);
-            ++argCount;
-        }
-
         public void Push(Ray ray)
         {
             try
@@ -248,11 +521,11 @@ namespace LuaInterface
                 luaState.Push(ray);
                 ++argCount;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 EndPCall();
                 throw e;
-            }            
+            }
         }
 
         public void Push(Bounds bounds)
@@ -266,7 +539,7 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            }  
+            }
         }
 
         public void Push(RaycastHit hit)
@@ -294,28 +567,80 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            }  
+            }
         }
 
         public void Push(LuaByteBuffer buffer)
         {
-            luaState.Push(buffer);
-            ++argCount;
+            try
+            {
+                luaState.Push(buffer);
+                ++argCount;
+            }
+            catch (Exception e)
+            {
+                EndPCall();
+                throw e;
+            }
         }
 
-        public void PushValue(ValueType value)
+        public void PushValue<T>(T value) where T : struct
         {
-            luaState.PushValue(value);
-            ++argCount;
+            try
+            {
+                luaState.PushValue(value);
+                ++argCount;
+            }
+            catch (Exception e)
+            {
+                EndPCall();
+                throw e;
+            }
         }
 
         public void PushObject(object o)
         {
-            luaState.PushObject(o);
-            ++argCount;
+            try
+            {
+                luaState.PushObject(o);
+                ++argCount;
+            }
+            catch (Exception e)
+            {
+                EndPCall();
+                throw e;
+            }
         }
 
-        public void PushArgs(object[] args)        
+        public void PushSealed<T>(T o)
+        {
+            try
+            {
+                luaState.PushSealed(o);
+                ++argCount;
+            }
+            catch (Exception e)
+            {
+                EndPCall();
+                throw e;
+            }
+        }
+
+        public void PushGeneric<T>(T t)
+        {
+            try
+            {
+                luaState.PushGeneric(t);
+                ++argCount;
+            }
+            catch (Exception e)
+            {
+                EndPCall();
+                throw e;
+            }
+        }
+
+        public void PushArgs(object[] args)
         {
             if (args == null)
             {
@@ -326,32 +651,45 @@ namespace LuaInterface
             luaState.PushArgs(args);
         }
 
-        public void PushByteBuffer(byte[] buffer)
+        public void PushByteBuffer(byte[] buffer, int len = -1)
         {
-            luaState.PushByteBuffer(buffer);
-            ++argCount;
+            try
+            {
+                if (len == -1)
+                {
+                    len = buffer.Length;
+                }
+
+                luaState.PushByteBuffer(buffer, len);
+                ++argCount;
+            }
+            catch (Exception e)
+            {
+                EndPCall();
+                throw e;
+            }
         }
 
         public double CheckNumber()
         {
             try
             {
-                return luaState.CheckNumber(stackPos++);
+                return luaState.LuaCheckNumber(stackPos++);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 EndPCall();
                 throw e;
-            }            
+            }
         }
 
         public bool CheckBoolean()
         {
             try
             {
-                return luaState.CheckBoolean(stackPos++);
+                return luaState.LuaCheckBoolean(stackPos++);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 EndPCall();
                 throw e;
@@ -359,16 +697,16 @@ namespace LuaInterface
         }
 
         public string CheckString()
-        {            
+        {
             try
             {
-                return luaState.CheckString(stackPos++);                
+                return luaState.CheckString(stackPos++);
             }
             catch (Exception e)
             {
                 EndPCall();
                 throw e;
-            }            
+            }
         }
 
         public Vector3 CheckVector3()
@@ -377,11 +715,11 @@ namespace LuaInterface
             {
                 return luaState.CheckVector3(stackPos++);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 EndPCall();
                 throw e;
-            }                        
+            }
         }
 
         public Quaternion CheckQuaternion()
@@ -390,11 +728,11 @@ namespace LuaInterface
             {
                 return luaState.CheckQuaternion(stackPos++);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 EndPCall();
                 throw e;
-            }                        
+            }
         }
 
         public Vector2 CheckVector2()
@@ -403,11 +741,11 @@ namespace LuaInterface
             {
                 return luaState.CheckVector2(stackPos++);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 EndPCall();
                 throw e;
-            }                       
+            }
         }
 
         public Vector4 CheckVector4()
@@ -420,7 +758,7 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            } 
+            }
         }
 
         public Color CheckColor()
@@ -433,7 +771,7 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            } 
+            }
         }
 
         public Ray CheckRay()
@@ -459,7 +797,7 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            }        
+            }
         }
 
         public LayerMask CheckLayerMask()
@@ -472,20 +810,33 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            } 
+            }
         }
 
-        public LuaInteger64 CheckInteger64()
+        public long CheckLong()
         {
             try
             {
-                return luaState.CheckInteger64(stackPos++);
+                return luaState.CheckLong(stackPos++);
             }
             catch (Exception e)
             {
                 EndPCall();
                 throw e;
-            } 
+            }
+        }
+
+        public ulong CheckULong()
+        {
+            try
+            {
+                return luaState.CheckULong(stackPos++);
+            }
+            catch (Exception e)
+            {
+                EndPCall();
+                throw e;
+            }
         }
 
         public Delegate CheckDelegate()
@@ -498,7 +849,7 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            } 
+            }
         }
 
         public object CheckVariant()
@@ -516,7 +867,7 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            } 
+            }
         }
 
         public byte[] CheckByteBuffer()
@@ -529,7 +880,7 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            } 
+            }
         }
 
         public object CheckObject(Type t)
@@ -542,7 +893,7 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            } 
+            }
         }
 
         public LuaFunction CheckLuaFunction()
@@ -555,7 +906,7 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            } 
+            }
         }
 
         public LuaTable CheckLuaTable()
@@ -568,7 +919,7 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            } 
+            }
         }
 
         public LuaThread CheckLuaThread()
@@ -581,7 +932,20 @@ namespace LuaInterface
             {
                 EndPCall();
                 throw e;
-            } 
+            }
         }
-    }
+
+        public T CheckValue<T>()
+        {
+            try
+            {
+                return luaState.CheckValue<T>(stackPos++);
+            }
+            catch (Exception e)
+            {
+                EndPCall();
+                throw e;
+            }
+        }
+    }    
 }

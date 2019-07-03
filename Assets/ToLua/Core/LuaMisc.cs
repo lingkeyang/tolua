@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2015-2016 topameng(topameng@qq.com)
+Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,8 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace LuaInterface
 {
@@ -38,103 +40,185 @@ namespace LuaInterface
         }
     }
 
-    public enum LuaValueType
-    {
-        None = 0,
-        Vector3 = 1,
-        Quaternion = 2,
-        Vector2 = 3,
-        Color = 4,
-        Vector4 = 5,
-        Ray = 6,
-        Bounds = 7,
-        Touch = 8,
-        LayerMask = 9,
-        RaycastHit = 10,
-    }
-
     //让byte[] 压入成为lua string 而不是数组 userdata
-    public class LuaByteBuffer
+    //也可以使用LuaByteBufferAttribute来标记byte[]
+    public struct LuaByteBuffer
     {        
         public LuaByteBuffer(IntPtr source, int len)
+            : this()            
         {
             buffer = new byte[len];
+            Length = len;
             Marshal.Copy(source, buffer, 0, len);
         }
         
         public LuaByteBuffer(byte[] buf)
+            : this()
         {
-            this.buffer = buf;
+            buffer = buf;
+            Length = buf.Length;            
+        }
+
+        public LuaByteBuffer(byte[] buf, int len)
+            : this()
+        {            
+            buffer = buf;
+            Length = len;
+        }
+
+        public LuaByteBuffer(System.IO.MemoryStream stream)   
+            : this()         
+        {
+            buffer = stream.GetBuffer();
+            Length = (int)stream.Length;            
+        }
+
+        public static implicit operator LuaByteBuffer(System.IO.MemoryStream stream)
+        {
+            return new LuaByteBuffer(stream);
+        }
+
+        public byte[] buffer;    
+
+        public int Length
+        {
+            get;
+            private set;
+        }    
+    }   
+
+    public class LuaOut<T> { }
+    //public class LuaOutMetatable {}
+    public class NullObject { }
+
+    //泛型函数参数null代替
+    public struct nil { }
+
+    public class LuaDelegate
+    {
+        public LuaFunction func = null;
+        public LuaTable self = null;
+        public MethodInfo method = null; 
+
+        public LuaDelegate(LuaFunction func)
+        {
+            this.func = func;
+        }
+
+        public LuaDelegate(LuaFunction func, LuaTable self)
+        {
+            this.func = func;
+            this.self = self;
+        }
+
+        //如果count不是1，说明还有其他人引用，只能等待gc来处理
+        public virtual void Dispose()
+        {
+            method = null;
+
+            if (func != null)
+            {
+                func.Dispose(1);
+                func = null;
+            }
+
+            if (self != null)
+            {
+                self.Dispose(1);
+                self = null;
+            }
         }
 
         public override bool Equals(object o)
-        {
-            if ((object)o == null) return false;
-            LuaByteBuffer bb = o as LuaByteBuffer;
-            return bb != null && bb.buffer == buffer;
+        {                                    
+            if (o == null) return func == null && self == null;
+            LuaDelegate ld = o as LuaDelegate;
+
+            if (ld == null || ld.func != func || ld.self != self)
+            {
+                return false;
+            }
+
+            return ld.func != null;
         }
 
-        public static bool operator ==(LuaByteBuffer a, LuaByteBuffer b)
+        static bool CompareLuaDelegate(LuaDelegate a, LuaDelegate b)
         {
             if (System.Object.ReferenceEquals(a, b))
             {
                 return true;
             }
 
-            object l = (object)a;
+            object l = a;
             object r = b;
 
             if (l == null && r != null)
             {
-                return b.buffer == null;
+                return b.func == null && b.self == null;
             }
 
             if (l != null && r == null)
             {
-                return a.buffer == null;
+                return a.func == null && a.self == null;
             }
 
-            return a.buffer == b.buffer;
+            if (a.func != b.func || a.self != b.self)
+            {
+                return false;
+            }
+
+            return a.func != null;
         }
 
-        public static bool operator !=(LuaByteBuffer a, LuaByteBuffer b)
+        public static bool operator == (LuaDelegate a, LuaDelegate b)
         {
-            return !(a == b);
+            return CompareLuaDelegate(a, b);
         }
 
+        public static bool operator != (LuaDelegate a, LuaDelegate b)
+        {
+            return !CompareLuaDelegate(a, b);
+        }
         public override int GetHashCode()
         {
-            return buffer.GetHashCode();
-        }
-
-        public byte[] buffer = null;
-    }   
-
-    public class LuaOut<T> { }
-    public class LuaOutMetatable { }
-    public class NullObject { }
-
-    public class LuaDelegate
-    {
-        public LuaFunction func = null;
-
-        public LuaDelegate(LuaFunction func)
-        {
-            this.func = func;
+            return RuntimeHelpers.GetHashCode(this);            
         }
     }
 
     [NoToLuaAttribute]
     public static class LuaMisc
     {
+        public static string GetArrayRank(Type t)
+        {
+            int count = t.GetArrayRank();
+
+            if (count == 1)
+            {                
+                return "[]";
+            }
+
+            using (CString.Block())
+            {
+                CString sb = CString.Alloc(64);
+                sb.Append('[');
+
+                for (int i = 1; i < count; i++)
+                {
+                    sb.Append(',');
+                }
+
+                sb.Append(']');
+                return sb.ToString();
+            }
+        }
+
         public static string GetTypeName(Type t)
         {
             if (t.IsArray)
             {
-                t = t.GetElementType();
-                string str = GetTypeName(t);
-                str += "[]";
-                return str;
+                string str = GetTypeName(t.GetElementType());
+                str += GetArrayRank(t);
+                return str;                
             }
             else if (t.IsByRef)
             {
@@ -152,7 +236,7 @@ namespace LuaInterface
             else
             {
                 string name = GetPrimitiveStr(t);
-                return name.Replace('+', '.');                
+                return name.Replace('+', '.');
             }
         }
 
@@ -193,10 +277,14 @@ namespace LuaInterface
         static string GetGenericName(Type t)
         {
             Type[] gArgs = t.GetGenericArguments();
-            string typeName = t.FullName;
+            string typeName = t.FullName ?? t.Name;
             int count = gArgs.Length;
             int pos = typeName.IndexOf("[");
-            typeName = typeName.Substring(0, pos);
+
+            if (pos > 0)
+            {
+                typeName = typeName.Substring(0, pos);
+            }
 
             string str = null;
             string name = null;
@@ -254,9 +342,17 @@ namespace LuaInterface
             {
                 return "int";
             }
-            else if (t == typeof(System.Int64))
+            else if (t == typeof(System.Double))
             {
-                return "long";
+                return "double";
+            }
+            else if (t == typeof(System.Boolean))
+            {
+                return "bool";
+            }
+            else if (t == typeof(System.UInt32))
+            {
+                return "uint";
             }
             else if (t == typeof(System.SByte))
             {
@@ -278,9 +374,9 @@ namespace LuaInterface
             {
                 return "char";
             }
-            else if (t == typeof(System.UInt32))
+            else if (t == typeof(System.Int64))
             {
-                return "uint";
+                return "long";
             }
             else if (t == typeof(System.UInt64))
             {
@@ -290,14 +386,6 @@ namespace LuaInterface
             {
                 return "decimal";
             }
-            else if (t == typeof(System.Double))
-            {
-                return "double";
-            }
-            else if (t == typeof(System.Boolean))
-            {
-                return "bool";
-            }
             else if (t == typeof(System.Object))
             {
                 return "object";
@@ -306,7 +394,7 @@ namespace LuaInterface
             {
                 return t.ToString();
             }
-        }
+        }        
 
         public static double ToDouble(object obj)
         {
@@ -365,9 +453,27 @@ namespace LuaInterface
 
             return 0;
         }
+
+        //可产生导出文件的基类
+        public static Type GetExportBaseType(Type t)
+        {
+            Type baseType = t.BaseType;
+
+            if (baseType == typeof(ValueType))
+            {
+                return null;
+            }
+
+            if (t.IsAbstract && t.IsSealed)
+            {
+                return baseType == typeof(object) ? null : baseType;
+            }
+
+            return baseType;
+        }
     }       
 
-    [NoToLuaAttribute]
+    /*[NoToLuaAttribute]
     public struct LuaInteger64
     {
         public long i64;
@@ -396,7 +502,7 @@ namespace LuaInterface
         {
             return Convert.ToString(i64);
         }
-    }
+    }*/
 
     public class TouchBits
     {
@@ -428,34 +534,28 @@ namespace LuaInterface
         [NoToLuaAttribute]
         public EventOp op = EventOp.None;
         [NoToLuaAttribute]
-        public LuaFunction func = null;
+        public Delegate func = null;
         [NoToLuaAttribute]
-        public string name = string.Empty;
+        public Type type;
 
         [NoToLuaAttribute]
-        public EventObject(string name)
+        public EventObject(Type t)
         {
-            this.name = name;
+            type = t;
         }
 
-        public static EventObject operator +(EventObject a, LuaFunction b)
+        public static EventObject operator +(EventObject a, Delegate b)
         {
             a.op = EventOp.Add;
             a.func = b;
             return a;
         }
 
-        public static EventObject operator -(EventObject a, LuaFunction b)
+        public static EventObject operator -(EventObject a, Delegate b)
         {
             a.op = EventOp.Sub;
             a.func = b;
             return a;
-        }
-
-        [NoToLuaAttribute]
-        public override string ToString()
-        {
-            return name;
         }
     }
 }

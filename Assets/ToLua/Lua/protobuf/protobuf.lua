@@ -29,17 +29,17 @@ local tostring = tostring
 local type = type
 
 local pb = require "pb"
-local wire_format = require "protobuf/wire_format"
-local type_checkers = require "protobuf/type_checkers"
-local encoder = require "protobuf/encoder"
-local decoder = require "protobuf/decoder"
-local listener_mod = require "protobuf/listener"
-local containers = require "protobuf/containers"
-local descriptor = require "protobuf/descriptor"
+local wire_format = require "protobuf.wire_format"
+local type_checkers = require "protobuf.type_checkers"
+local encoder = require "protobuf.encoder"
+local decoder = require "protobuf.decoder"
+local listener_mod = require "protobuf.listener"
+local containers = require "protobuf.containers"
+local descriptor = require "protobuf.descriptor"
 local FieldDescriptor = descriptor.FieldDescriptor
-local text_format = require "protobuf/text_format"
+local text_format = require "protobuf.text_format"
 
-module("protobuf/protobuf")
+module("protobuf.protobuf")
 
 local function make_descriptor(name, descriptor, usable_key)
     local meta = {
@@ -787,20 +787,20 @@ local function _AddIsInitializedMethod(message_descriptor, message_meta)
 
         for _,field in ipairs(required_fields) do
             if not message_meta._member.HasField(self, field.name) then
-                errors.append(field.name) 
+                errors[#errors + 1] = field.name
             end
         end
 
         for field, value in message_meta._member.ListFields(self) do
             if field.cpp_type == FieldDescriptor.CPPTYPE_MESSAGE then
                 if field.is_extension then
-                    name = io:format("(%s)", field.full_name)
+                    name = string.format("(%s)", field.full_name)
                 else
                     name = field.name
                 end
                 if field.label == FieldDescriptor.LABEL_REPEATED then
                     for i, element in ipairs(value) do
-                        prefix = io:format("%s[%d].", name, i)
+                        prefix = string.format("%s[%d].", name, i)
                         sub_errors = element:FindInitializationErrors()
                         for _, e in ipairs(sub_errors) do
                             errors[#errors + 1] = prefix .. e

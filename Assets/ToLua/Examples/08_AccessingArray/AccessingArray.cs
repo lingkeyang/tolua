@@ -1,31 +1,62 @@
 ﻿using UnityEngine;
 using LuaInterface;
 
-public class AccessingArray : MonoBehaviour 
+public class AccessingArray : MonoBehaviour
 {
     private string script =
         @"
-            function TestArray(strs)
-                local len = strs.Length
+            function TestArray(array)
+                local len = array.Length
                 
                 for i = 0, len - 1 do
-                    print(strs[i])
+                    print('Array: '..tostring(array[i]))
                 end
+
+                local iter = array:GetEnumerator()
+
+                while iter:MoveNext() do
+                    print('iter: '..iter.Current)
+                end
+
+                local t = array:ToTable()                
+                
+                for i = 1, #t do
+                    print('table: '.. tostring(t[i]))
+                end
+
+                local pos = array:BinarySearch(3)
+                print('array BinarySearch: pos: '..pos..' value: '..array[pos])
+
+                pos = array:IndexOf(4)
+                print('array indexof bbb pos is: '..pos)
+                
                 return 1, '123', true
             end            
         ";
 
+    LuaState lua = null;
+    LuaFunction func = null;
+    string tips = null;
+
+#pragma warning disable 0618
     void Start()
     {
-        LuaState lua = new LuaState();
+#if UNITY_5 || UNITY_2017 || UNITY_2018
+        Application.logMessageReceived += ShowTips;
+#else
+        Application.RegisterLogCallback(ShowTips);
+#endif
+        new LuaResLoader();
+        lua = new LuaState();
         lua.Start();
-        lua.DoString(script);
+        lua.DoString(script, "AccessingArray.cs");
+        tips = "";
 
-        string[] strs = { "aaa", "bbb", "ccc" };
-        LuaFunction func = lua.GetFunction("TestArray");
+        int[] array = { 1, 2, 3, 4, 5 };
+        func = lua.GetFunction("TestArray");
 
         func.BeginPCall();
-        func.Push(strs);
+        func.Push(array);
         func.PCall();
         double arg1 = func.CheckNumber();
         string arg2 = func.CheckString();
@@ -33,8 +64,8 @@ public class AccessingArray : MonoBehaviour
         Debugger.Log("return is {0} {1} {2}", arg1, arg2, arg3);
         func.EndPCall();
 
-        //转换一下类型，避免可变参数拆成多个参数传递
-        object[] objs = func.Call((object)strs);
+        //调用通用函数需要转换一下类型，避免可变参数拆成多个参数传递
+        object[] objs = func.LazyCall((object)array);
 
         if (objs != null)
         {
@@ -42,6 +73,28 @@ public class AccessingArray : MonoBehaviour
         }
 
         lua.CheckTop();
+    }
+
+#pragma warning restore 0618
+
+    void ShowTips(string msg, string stackTrace, LogType type)
+    {
+        tips += msg;
+        tips += "\r\n";
+    }
+
+    void OnGUI()
+    {
+        GUI.Label(new Rect(Screen.width / 2 - 300, Screen.height / 2 - 300, 600, 600), tips);
+    }
+
+    void OnApplicationQuit()
+    {
+#if UNITY_5 || UNITY_2017 || UNITY_2018
+        Application.logMessageReceived -= ShowTips;
+#else
+        Application.RegisterLogCallback(null);
+#endif
         func.Dispose();
         lua.Dispose();
     }

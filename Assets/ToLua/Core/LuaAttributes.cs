@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2015-2016 topameng(topameng@qq.com)
+Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,11 +46,28 @@ namespace LuaInterface
 
         }
     }
+
+    public class OverrideDefinedAttribute: System.Attribute
+    {
+        public OverrideDefinedAttribute()
+        {
+
+        }
+    }
     
     public sealed class LuaByteBufferAttribute : Attribute
     {                
         public LuaByteBufferAttribute()
         {
         }       
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class LuaRenameAttribute : Attribute
+    {
+        public string Name;
+        public LuaRenameAttribute()
+        {
+        }
     }
 }

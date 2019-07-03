@@ -7,10 +7,10 @@ public class TestUTF8 : LuaClient
 @"
     local utf8 = utf8
 
-    function Test()
+    function Test()        
 	    local l1 = utf8.len('你好')
         local l2 = utf8.len('こんにちは')
-        print('chinese string len is: '..l1..' japanese len: '..l2)     
+        print('chinese string len is: '..l1..' japanese sting len: '..l2)     
 
         local s = '遍历字符串'                                        
 
@@ -18,12 +18,6 @@ public class TestUTF8 : LuaClient
             local next = utf8.next(s, i)                   
             print(s:sub(i, next and next -1))
         end   
-
-        local len = utf8.len(s)                               
-
-        for i = 2, len + 1 do
-            print(utf8.sub(s, 1, i)..'...')        
-        end
 
         local s1 = '天下风云出我辈'        
         print('风云 count is: '..utf8.count(s1, '风云'))
@@ -49,11 +43,40 @@ public class TestUTF8 : LuaClient
 
     protected override void OnLoadFinished()
     {
+#if UNITY_4_6 || UNITY_4_7
+        Application.RegisterLogCallback(ShowTips);        
+#else
+        Application.logMessageReceived += ShowTips;
+#endif
         base.OnLoadFinished();
         luaState.DoString(script);
         LuaFunction func = luaState.GetFunction("Test");
         func.Call();
         func.Dispose();
         func = null;
+    }
+
+    string tips;
+
+    void ShowTips(string msg, string stackTrace, LogType type)
+    {
+        tips += msg;
+        tips += "\r\n";
+    }
+
+    new void OnApplicationQuit()
+    {
+        base.OnApplicationQuit();
+
+#if UNITY_4_6 || UNITY_4_7
+        Application.RegisterLogCallback(null);        
+#else
+        Application.logMessageReceived -= ShowTips;
+#endif
+    }
+
+    void OnGUI()
+    {
+        GUI.Label(new Rect(Screen.width / 2 - 300, Screen.height / 2 - 300, 600, 600), tips);
     }
 }

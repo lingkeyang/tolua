@@ -8,8 +8,8 @@ public class TestCoroutine2 : LuaClient
     string script =
     @"
         function CoExample()            
-            WaitForSeconds(2)
-            print('WaitForSeconds end time: '.. UnityEngine.Time.time)
+            WaitForSeconds(1)
+            print('WaitForSeconds end time: '.. UnityEngine.Time.time)            
             WaitForFixedUpdate()
             print('WaitForFixedUpdate end frameCount: '..UnityEngine.Time.frameCount)
             WaitForEndOfFrame()
@@ -48,14 +48,20 @@ public class TestCoroutine2 : LuaClient
 
         function StopDelay()
 	        StopCoroutine(coDelay)
+            coDelay = nil
         end
     ";
+
+    protected override LuaFileUtils InitLoader()
+    {
+        return new LuaResLoader();
+    }
 
     protected override void OnLoadFinished()
     {
         base.OnLoadFinished();
 
-        luaState.DoString(script);
+        luaState.DoString(script, "TestCoroutine2.cs");
         LuaFunction func = luaState.GetFunction("TestCo");
         func.Call();
         func.Dispose();
@@ -65,19 +71,58 @@ public class TestCoroutine2 : LuaClient
     //屏蔽，例子不需要运行
     protected override void CallMain() { }
 
+    bool beStart = false;
+    string tips = null;
+
+    void Start()
+    {
+#if UNITY_5 || UNITY_2017 || UNITY_2018
+        Application.logMessageReceived += ShowTips;
+#else
+        Application.RegisterLogCallback(ShowTips);
+#endif
+    }
+
+    void ShowTips(string msg, string stackTrace, LogType type)
+    {
+        tips += msg;
+        tips += "\r\n";
+    }
+
+    new void OnApplicationQuit()
+    {
+#if UNITY_5 || UNITY_2017 || UNITY_2018
+        Application.logMessageReceived -= ShowTips;
+#else
+        Application.RegisterLogCallback(null);
+#endif
+        base.OnApplicationQuit();
+    }
+
     void OnGUI()
     {
-        if (GUI.Button(new Rect(50, 50, 120, 45), "Start Coroutine"))
+        GUI.Label(new Rect(Screen.width / 2 - 300, Screen.height / 2 - 200, 600, 400), tips);
+
+        if (GUI.Button(new Rect(50, 50, 120, 45), "Start Counter"))
         {
-            LuaFunction func = luaState.GetFunction("StartDelay");
-            func.Call();
-            func.Dispose();
+            if (!beStart)
+            {
+                beStart = true;
+                tips = "";
+                LuaFunction func = luaState.GetFunction("StartDelay");
+                func.Call();
+                func.Dispose();
+            }
         }
-        else if (GUI.Button(new Rect(50, 150, 120, 45), "Stop Coroutine"))
+        else if (GUI.Button(new Rect(50, 150, 120, 45), "Stop Counter"))
         {
-            LuaFunction func = luaState.GetFunction("StopDelay");
-            func.Call();
-            func.Dispose();
+            if (beStart)
+            {
+                beStart = false;
+                LuaFunction func = luaState.GetFunction("StopDelay");
+                func.Call();
+                func.Dispose();
+            }
         }
     }
 }

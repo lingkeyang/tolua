@@ -11,9 +11,7 @@ public class System_TypeWrap
 		L.RegFunction("GetType", GetType);
 		L.RegFunction("GetTypeArray", GetTypeArray);
 		L.RegFunction("GetTypeCode", GetTypeCode);
-		L.RegFunction("GetTypeFromCLSID", GetTypeFromCLSID);
 		L.RegFunction("GetTypeFromHandle", GetTypeFromHandle);
-		L.RegFunction("GetTypeFromProgID", GetTypeFromProgID);
 		L.RegFunction("GetTypeHandle", GetTypeHandle);
 		L.RegFunction("IsSubclassOf", IsSubclassOf);
 		L.RegFunction("FindInterfaces", FindInterfaces);
@@ -24,21 +22,9 @@ public class System_TypeWrap
 		L.RegFunction("IsInstanceOfType", IsInstanceOfType);
 		L.RegFunction("GetArrayRank", GetArrayRank);
 		L.RegFunction("GetElementType", GetElementType);
-		L.RegFunction("GetEvent", GetEvent);
-		L.RegFunction("GetEvents", GetEvents);
-		L.RegFunction("GetField", GetField);
-		L.RegFunction("GetFields", GetFields);
 		L.RegFunction("GetHashCode", GetHashCode);
-		L.RegFunction("GetMember", GetMember);
-		L.RegFunction("GetMembers", GetMembers);
-		L.RegFunction("GetMethod", GetMethod);
-		L.RegFunction("GetMethods", GetMethods);
 		L.RegFunction("GetNestedType", GetNestedType);
 		L.RegFunction("GetNestedTypes", GetNestedTypes);
-		L.RegFunction("GetProperties", GetProperties);
-		L.RegFunction("GetProperty", GetProperty);
-		L.RegFunction("GetConstructor", GetConstructor);
-		L.RegFunction("GetConstructors", GetConstructors);
 		L.RegFunction("GetDefaultMembers", GetDefaultMembers);
 		L.RegFunction("FindMembers", FindMembers);
 		L.RegFunction("InvokeMember", InvokeMember);
@@ -51,7 +37,7 @@ public class System_TypeWrap
 		L.RegFunction("MakeByRefType", MakeByRefType);
 		L.RegFunction("MakePointerType", MakePointerType);
 		L.RegFunction("ReflectionOnlyGetType", ReflectionOnlyGetType);
-		L.RegFunction("__tostring", Lua_ToString);
+		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("Delimiter", get_Delimiter, null);
 		L.RegVar("EmptyTypes", get_EmptyTypes, null);
 		L.RegVar("FilterAttribute", get_FilterAttribute, null);
@@ -124,17 +110,17 @@ public class System_TypeWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(System.Type)))
+			if (count == 2 && TypeChecker.CheckTypes<System.Type>(L, 2))
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
 				System.Type arg0 = (System.Type)ToLua.ToObject(L, 2);
 				bool o = obj != null ? obj.Equals(arg0) : arg0 == null;
 				LuaDLL.lua_pushboolean(L, o);
 				return 1;
 			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(object)))
+			else if (count == 2 && TypeChecker.CheckTypes<object>(L, 2))
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
 				object arg0 = ToLua.ToVarObject(L, 2);
 				bool o = obj != null ? obj.Equals(arg0) : arg0 == null;
 				LuaDLL.lua_pushboolean(L, o);
@@ -145,7 +131,7 @@ public class System_TypeWrap
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.Equals");
 			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -158,33 +144,33 @@ public class System_TypeWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Type)))
+			if (count == 1 && TypeChecker.CheckTypes<System.Type>(L, 1))
 			{
 				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
 				System.Type o = obj.GetType();
 				ToLua.Push(L, o);
 				return 1;
 			}
-			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(string)))
+			else if (count == 1 && TypeChecker.CheckTypes<string>(L, 1))
 			{
 				string arg0 = ToLua.ToString(L, 1);
 				System.Type o = System.Type.GetType(arg0);
 				ToLua.Push(L, o);
 				return 1;
 			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(bool)))
+			else if (count == 2)
 			{
-				string arg0 = ToLua.ToString(L, 1);
-				bool arg1 = LuaDLL.lua_toboolean(L, 2);
+				string arg0 = ToLua.CheckString(L, 1);
+				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
 				System.Type o = System.Type.GetType(arg0, arg1);
 				ToLua.Push(L, o);
 				return 1;
 			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(bool), typeof(bool)))
+			else if (count == 3)
 			{
-				string arg0 = ToLua.ToString(L, 1);
-				bool arg1 = LuaDLL.lua_toboolean(L, 2);
-				bool arg2 = LuaDLL.lua_toboolean(L, 3);
+				string arg0 = ToLua.CheckString(L, 1);
+				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
+				bool arg2 = LuaDLL.luaL_checkboolean(L, 3);
 				System.Type o = System.Type.GetType(arg0, arg1, arg2);
 				ToLua.Push(L, o);
 				return 1;
@@ -194,7 +180,7 @@ public class System_TypeWrap
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetType");
 			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -211,7 +197,7 @@ public class System_TypeWrap
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -223,62 +209,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type arg0 = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type arg0 = ToLua.CheckMonoType(L, 1);
 			System.TypeCode o = System.Type.GetTypeCode(arg0);
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetTypeFromCLSID(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Guid)))
-			{
-				System.Guid arg0 = (System.Guid)ToLua.ToObject(L, 1);
-				System.Type o = System.Type.GetTypeFromCLSID(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Guid), typeof(string)))
-			{
-				System.Guid arg0 = (System.Guid)ToLua.ToObject(L, 1);
-				string arg1 = ToLua.ToString(L, 2);
-				System.Type o = System.Type.GetTypeFromCLSID(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Guid), typeof(bool)))
-			{
-				System.Guid arg0 = (System.Guid)ToLua.ToObject(L, 1);
-				bool arg1 = LuaDLL.lua_toboolean(L, 2);
-				System.Type o = System.Type.GetTypeFromCLSID(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Guid), typeof(string), typeof(bool)))
-			{
-				System.Guid arg0 = (System.Guid)ToLua.ToObject(L, 1);
-				string arg1 = ToLua.ToString(L, 2);
-				bool arg2 = LuaDLL.lua_toboolean(L, 3);
-				System.Type o = System.Type.GetTypeFromCLSID(arg0, arg1, arg2);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetTypeFromCLSID");
-			}
-		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -290,62 +226,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.RuntimeTypeHandle arg0 = (System.RuntimeTypeHandle)ToLua.CheckObject(L, 1, typeof(System.RuntimeTypeHandle));
+			System.RuntimeTypeHandle arg0 = StackTraits<System.RuntimeTypeHandle>.Check(L, 1);
 			System.Type o = System.Type.GetTypeFromHandle(arg0);
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetTypeFromProgID(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(string)))
-			{
-				string arg0 = ToLua.ToString(L, 1);
-				System.Type o = System.Type.GetTypeFromProgID(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(string)))
-			{
-				string arg0 = ToLua.ToString(L, 1);
-				string arg1 = ToLua.ToString(L, 2);
-				System.Type o = System.Type.GetTypeFromProgID(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(bool)))
-			{
-				string arg0 = ToLua.ToString(L, 1);
-				bool arg1 = LuaDLL.lua_toboolean(L, 2);
-				System.Type o = System.Type.GetTypeFromProgID(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(string), typeof(bool)))
-			{
-				string arg0 = ToLua.ToString(L, 1);
-				string arg1 = ToLua.ToString(L, 2);
-				bool arg2 = LuaDLL.lua_toboolean(L, 3);
-				System.Type o = System.Type.GetTypeFromProgID(arg0, arg1, arg2);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetTypeFromProgID");
-			}
-		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -362,7 +248,7 @@ public class System_TypeWrap
 			ToLua.PushValue(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -374,13 +260,13 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 2);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
-			System.Type arg0 = (System.Type)ToLua.CheckObject(L, 2, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Type arg0 = ToLua.CheckMonoType(L, 2);
 			bool o = obj.IsSubclassOf(arg0);
 			LuaDLL.lua_pushboolean(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -392,26 +278,14 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 3);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
-			System.Reflection.TypeFilter arg0 = null;
-			LuaTypes funcType2 = LuaDLL.lua_type(L, 2);
-
-			if (funcType2 != LuaTypes.LUA_TFUNCTION)
-			{
-				 arg0 = (System.Reflection.TypeFilter)ToLua.CheckObject(L, 2, typeof(System.Reflection.TypeFilter));
-			}
-			else
-			{
-				LuaFunction func = ToLua.ToLuaFunction(L, 2);
-				arg0 = DelegateFactory.CreateDelegate(typeof(System.Reflection.TypeFilter), func) as System.Reflection.TypeFilter;
-			}
-
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Reflection.TypeFilter arg0 = (System.Reflection.TypeFilter)ToLua.CheckDelegate<System.Reflection.TypeFilter>(L, 2);
 			object arg1 = ToLua.ToVarObject(L, 3);
 			System.Type[] o = obj.FindInterfaces(arg0, arg1);
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -424,19 +298,19 @@ public class System_TypeWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string)))
+			if (count == 2)
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
 				System.Type o = obj.GetInterface(arg0);
 				ToLua.Push(L, o);
 				return 1;
 			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(bool)))
+			else if (count == 3)
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				bool arg1 = LuaDLL.lua_toboolean(L, 3);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
+				bool arg1 = LuaDLL.luaL_checkboolean(L, 3);
 				System.Type o = obj.GetInterface(arg0, arg1);
 				ToLua.Push(L, o);
 				return 1;
@@ -446,7 +320,7 @@ public class System_TypeWrap
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetInterface");
 			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -458,13 +332,13 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 2);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
-			System.Type arg0 = (System.Type)ToLua.CheckObject(L, 2, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Type arg0 = ToLua.CheckMonoType(L, 2);
 			System.Reflection.InterfaceMapping o = obj.GetInterfaceMap(arg0);
 			ToLua.PushValue(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -476,12 +350,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			System.Type[] o = obj.GetInterfaces();
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -493,13 +367,13 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 2);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
-			System.Type arg0 = (System.Type)ToLua.CheckObject(L, 2, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Type arg0 = ToLua.CheckMonoType(L, 2);
 			bool o = obj.IsAssignableFrom(arg0);
 			LuaDLL.lua_pushboolean(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -511,13 +385,13 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 2);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			object arg0 = ToLua.ToVarObject(L, 2);
 			bool o = obj.IsInstanceOfType(arg0);
 			LuaDLL.lua_pushboolean(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -529,12 +403,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			int o = obj.GetArrayRank();
 			LuaDLL.lua_pushinteger(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -546,148 +420,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			System.Type o = obj.GetElementType();
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetEvent(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.EventInfo o = obj.GetEvent(arg0);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
-				System.Reflection.EventInfo o = obj.GetEvent(arg0, arg1);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetEvent");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetEvents(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Type)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.EventInfo[] o = obj.GetEvents();
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 2);
-				System.Reflection.EventInfo[] o = obj.GetEvents(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetEvents");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetField(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.FieldInfo o = obj.GetField(arg0);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
-				System.Reflection.FieldInfo o = obj.GetField(arg0, arg1);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetField");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetFields(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Type)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.FieldInfo[] o = obj.GetFields();
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 2);
-				System.Reflection.FieldInfo[] o = obj.GetFields(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetFields");
-			}
-		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -699,202 +437,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			int o = obj.GetHashCode();
 			LuaDLL.lua_pushinteger(L, o);
 			return 1;
 		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetMember(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.MemberInfo[] o = obj.GetMember(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
-				System.Reflection.MemberInfo[] o = obj.GetMember(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 4 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.MemberTypes), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.MemberTypes arg1 = (System.Reflection.MemberTypes)ToLua.ToObject(L, 3);
-				System.Reflection.BindingFlags arg2 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 4);
-				System.Reflection.MemberInfo[] o = obj.GetMember(arg0, arg1, arg2);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetMember");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetMembers(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Type)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.MemberInfo[] o = obj.GetMembers();
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 2);
-				System.Reflection.MemberInfo[] o = obj.GetMembers(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetMembers");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetMethod(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.MethodInfo o = obj.GetMethod(arg0);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Type[])))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Type[] arg1 = ToLua.CheckObjectArray<System.Type>(L, 3);
-				System.Reflection.MethodInfo o = obj.GetMethod(arg0, arg1);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
-				System.Reflection.MethodInfo o = obj.GetMethod(arg0, arg1);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 4 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Type[]), typeof(System.Reflection.ParameterModifier[])))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Type[] arg1 = ToLua.CheckObjectArray<System.Type>(L, 3);
-				System.Reflection.ParameterModifier[] arg2 = ToLua.CheckObjectArray<System.Reflection.ParameterModifier>(L, 4);
-				System.Reflection.MethodInfo o = obj.GetMethod(arg0, arg1, arg2);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 6 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags), typeof(System.Reflection.Binder), typeof(System.Type[]), typeof(System.Reflection.ParameterModifier[])))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
-				System.Reflection.Binder arg2 = (System.Reflection.Binder)ToLua.ToObject(L, 4);
-				System.Type[] arg3 = ToLua.CheckObjectArray<System.Type>(L, 5);
-				System.Reflection.ParameterModifier[] arg4 = ToLua.CheckObjectArray<System.Reflection.ParameterModifier>(L, 6);
-				System.Reflection.MethodInfo o = obj.GetMethod(arg0, arg1, arg2, arg3, arg4);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 7 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags), typeof(System.Reflection.Binder), typeof(System.Reflection.CallingConventions), typeof(System.Type[]), typeof(System.Reflection.ParameterModifier[])))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
-				System.Reflection.Binder arg2 = (System.Reflection.Binder)ToLua.ToObject(L, 4);
-				System.Reflection.CallingConventions arg3 = (System.Reflection.CallingConventions)ToLua.ToObject(L, 5);
-				System.Type[] arg4 = ToLua.CheckObjectArray<System.Type>(L, 6);
-				System.Reflection.ParameterModifier[] arg5 = ToLua.CheckObjectArray<System.Reflection.ParameterModifier>(L, 7);
-				System.Reflection.MethodInfo o = obj.GetMethod(arg0, arg1, arg2, arg3, arg4, arg5);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetMethod");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetMethods(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Type)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.MethodInfo[] o = obj.GetMethods();
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 2);
-				System.Reflection.MethodInfo[] o = obj.GetMethods(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetMethods");
-			}
-		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -907,19 +455,19 @@ public class System_TypeWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string)))
+			if (count == 2)
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
 				System.Type o = obj.GetNestedType(arg0);
 				ToLua.Push(L, o);
 				return 1;
 			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags)))
+			else if (count == 3)
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
+				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 3);
 				System.Type o = obj.GetNestedType(arg0, arg1);
 				ToLua.Push(L, o);
 				return 1;
@@ -929,7 +477,7 @@ public class System_TypeWrap
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetNestedType");
 			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -942,17 +490,17 @@ public class System_TypeWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Type)))
+			if (count == 1)
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
 				System.Type[] o = obj.GetNestedTypes();
 				ToLua.Push(L, o);
 				return 1;
 			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(System.Reflection.BindingFlags)))
+			else if (count == 2)
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 2);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 2);
 				System.Type[] o = obj.GetNestedTypes(arg0);
 				ToLua.Push(L, o);
 				return 1;
@@ -962,209 +510,7 @@ public class System_TypeWrap
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetNestedTypes");
 			}
 		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetProperties(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Type)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.PropertyInfo[] o = obj.GetProperties();
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 2);
-				System.Reflection.PropertyInfo[] o = obj.GetProperties(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetProperties");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetProperty(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.PropertyInfo o = obj.GetProperty(arg0);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Type[])))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Type[] arg1 = ToLua.CheckObjectArray<System.Type>(L, 3);
-				System.Reflection.PropertyInfo o = obj.GetProperty(arg0, arg1);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Type)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Type arg1 = (System.Type)ToLua.ToObject(L, 3);
-				System.Reflection.PropertyInfo o = obj.GetProperty(arg0, arg1);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
-				System.Reflection.PropertyInfo o = obj.GetProperty(arg0, arg1);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 4 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Type), typeof(System.Type[])))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Type arg1 = (System.Type)ToLua.ToObject(L, 3);
-				System.Type[] arg2 = ToLua.CheckObjectArray<System.Type>(L, 4);
-				System.Reflection.PropertyInfo o = obj.GetProperty(arg0, arg1, arg2);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 5 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Type), typeof(System.Type[]), typeof(System.Reflection.ParameterModifier[])))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Type arg1 = (System.Type)ToLua.ToObject(L, 3);
-				System.Type[] arg2 = ToLua.CheckObjectArray<System.Type>(L, 4);
-				System.Reflection.ParameterModifier[] arg3 = ToLua.CheckObjectArray<System.Reflection.ParameterModifier>(L, 5);
-				System.Reflection.PropertyInfo o = obj.GetProperty(arg0, arg1, arg2, arg3);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 7 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags), typeof(System.Reflection.Binder), typeof(System.Type), typeof(System.Type[]), typeof(System.Reflection.ParameterModifier[])))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
-				System.Reflection.Binder arg2 = (System.Reflection.Binder)ToLua.ToObject(L, 4);
-				System.Type arg3 = (System.Type)ToLua.ToObject(L, 5);
-				System.Type[] arg4 = ToLua.CheckObjectArray<System.Type>(L, 6);
-				System.Reflection.ParameterModifier[] arg5 = ToLua.CheckObjectArray<System.Reflection.ParameterModifier>(L, 7);
-				System.Reflection.PropertyInfo o = obj.GetProperty(arg0, arg1, arg2, arg3, arg4, arg5);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetProperty");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetConstructor(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(System.Type[])))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Type[] arg0 = ToLua.CheckObjectArray<System.Type>(L, 2);
-				System.Reflection.ConstructorInfo o = obj.GetConstructor(arg0);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 5 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(System.Reflection.BindingFlags), typeof(System.Reflection.Binder), typeof(System.Type[]), typeof(System.Reflection.ParameterModifier[])))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 2);
-				System.Reflection.Binder arg1 = (System.Reflection.Binder)ToLua.ToObject(L, 3);
-				System.Type[] arg2 = ToLua.CheckObjectArray<System.Type>(L, 4);
-				System.Reflection.ParameterModifier[] arg3 = ToLua.CheckObjectArray<System.Reflection.ParameterModifier>(L, 5);
-				System.Reflection.ConstructorInfo o = obj.GetConstructor(arg0, arg1, arg2, arg3);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else if (count == 6 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(System.Reflection.BindingFlags), typeof(System.Reflection.Binder), typeof(System.Reflection.CallingConventions), typeof(System.Type[]), typeof(System.Reflection.ParameterModifier[])))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 2);
-				System.Reflection.Binder arg1 = (System.Reflection.Binder)ToLua.ToObject(L, 3);
-				System.Reflection.CallingConventions arg2 = (System.Reflection.CallingConventions)ToLua.ToObject(L, 4);
-				System.Type[] arg3 = ToLua.CheckObjectArray<System.Type>(L, 5);
-				System.Reflection.ParameterModifier[] arg4 = ToLua.CheckObjectArray<System.Reflection.ParameterModifier>(L, 6);
-				System.Reflection.ConstructorInfo o = obj.GetConstructor(arg0, arg1, arg2, arg3, arg4);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetConstructor");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetConstructors(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Type)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.ConstructorInfo[] o = obj.GetConstructors();
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(System.Reflection.BindingFlags)))
-			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 2);
-				System.Reflection.ConstructorInfo[] o = obj.GetConstructors(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetConstructors");
-			}
-		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1176,12 +522,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			System.Reflection.MemberInfo[] o = obj.GetDefaultMembers();
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1193,28 +539,16 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 5);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			System.Reflection.MemberTypes arg0 = (System.Reflection.MemberTypes)ToLua.CheckObject(L, 2, typeof(System.Reflection.MemberTypes));
-			System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.CheckObject(L, 3, typeof(System.Reflection.BindingFlags));
-			System.Reflection.MemberFilter arg2 = null;
-			LuaTypes funcType4 = LuaDLL.lua_type(L, 4);
-
-			if (funcType4 != LuaTypes.LUA_TFUNCTION)
-			{
-				 arg2 = (System.Reflection.MemberFilter)ToLua.CheckObject(L, 4, typeof(System.Reflection.MemberFilter));
-			}
-			else
-			{
-				LuaFunction func = ToLua.ToLuaFunction(L, 4);
-				arg2 = DelegateFactory.CreateDelegate(typeof(System.Reflection.MemberFilter), func) as System.Reflection.MemberFilter;
-			}
-
+			System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 3);
+			System.Reflection.MemberFilter arg2 = (System.Reflection.MemberFilter)ToLua.CheckDelegate<System.Reflection.MemberFilter>(L, 4);
 			object arg3 = ToLua.ToVarObject(L, 5);
 			System.Reflection.MemberInfo[] o = obj.FindMembers(arg0, arg1, arg2, arg3);
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1227,41 +561,41 @@ public class System_TypeWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 6 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags), typeof(System.Reflection.Binder), typeof(object), typeof(object[])))
+			if (count == 6)
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
-				System.Reflection.Binder arg2 = (System.Reflection.Binder)ToLua.ToObject(L, 4);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
+				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 3);
+				System.Reflection.Binder arg2 = (System.Reflection.Binder)ToLua.CheckObject<System.Reflection.Binder>(L, 4);
 				object arg3 = ToLua.ToVarObject(L, 5);
 				object[] arg4 = ToLua.CheckObjectArray(L, 6);
 				object o = obj.InvokeMember(arg0, arg1, arg2, arg3, arg4);
 				ToLua.Push(L, o);
 				return 1;
 			}
-			else if (count == 7 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags), typeof(System.Reflection.Binder), typeof(object), typeof(object[]), typeof(System.Globalization.CultureInfo)))
+			else if (count == 7)
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
-				System.Reflection.Binder arg2 = (System.Reflection.Binder)ToLua.ToObject(L, 4);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
+				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 3);
+				System.Reflection.Binder arg2 = (System.Reflection.Binder)ToLua.CheckObject<System.Reflection.Binder>(L, 4);
 				object arg3 = ToLua.ToVarObject(L, 5);
 				object[] arg4 = ToLua.CheckObjectArray(L, 6);
-				System.Globalization.CultureInfo arg5 = (System.Globalization.CultureInfo)ToLua.ToObject(L, 7);
+				System.Globalization.CultureInfo arg5 = (System.Globalization.CultureInfo)ToLua.CheckObject<System.Globalization.CultureInfo>(L, 7);
 				object o = obj.InvokeMember(arg0, arg1, arg2, arg3, arg4, arg5);
 				ToLua.Push(L, o);
 				return 1;
 			}
-			else if (count == 9 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(System.Reflection.BindingFlags), typeof(System.Reflection.Binder), typeof(object), typeof(object[]), typeof(System.Reflection.ParameterModifier[]), typeof(System.Globalization.CultureInfo), typeof(string[])))
+			else if (count == 9)
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)ToLua.ToObject(L, 3);
-				System.Reflection.Binder arg2 = (System.Reflection.Binder)ToLua.ToObject(L, 4);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
+				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 3);
+				System.Reflection.Binder arg2 = (System.Reflection.Binder)ToLua.CheckObject<System.Reflection.Binder>(L, 4);
 				object arg3 = ToLua.ToVarObject(L, 5);
 				object[] arg4 = ToLua.CheckObjectArray(L, 6);
-				System.Reflection.ParameterModifier[] arg5 = ToLua.CheckObjectArray<System.Reflection.ParameterModifier>(L, 7);
-				System.Globalization.CultureInfo arg6 = (System.Globalization.CultureInfo)ToLua.ToObject(L, 8);
+				System.Reflection.ParameterModifier[] arg5 = ToLua.CheckStructArray<System.Reflection.ParameterModifier>(L, 7);
+				System.Globalization.CultureInfo arg6 = (System.Globalization.CultureInfo)ToLua.CheckObject<System.Globalization.CultureInfo>(L, 8);
 				string[] arg7 = ToLua.CheckStringArray(L, 9);
 				object o = obj.InvokeMember(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 				ToLua.Push(L, o);
@@ -1272,7 +606,7 @@ public class System_TypeWrap
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.InvokeMember");
 			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1284,12 +618,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			string o = obj.ToString();
 			LuaDLL.lua_pushstring(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1301,12 +635,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			System.Type[] o = obj.GetGenericArguments();
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1318,12 +652,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			System.Type o = obj.GetGenericTypeDefinition();
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1335,13 +669,13 @@ public class System_TypeWrap
 		try
 		{
 			int count = LuaDLL.lua_gettop(L);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			System.Type[] arg0 = ToLua.CheckParamsObject<System.Type>(L, 2, count - 1);
 			System.Type o = obj.MakeGenericType(arg0);
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1353,12 +687,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			System.Type[] o = obj.GetGenericParameterConstraints();
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1371,17 +705,17 @@ public class System_TypeWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Type)))
+			if (count == 1)
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
 				System.Type o = obj.MakeArrayType();
 				ToLua.Push(L, o);
 				return 1;
 			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(int)))
+			else if (count == 2)
 			{
-				System.Type obj = (System.Type)ToLua.ToObject(L, 1);
-				int arg0 = (int)LuaDLL.lua_tonumber(L, 2);
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
 				System.Type o = obj.MakeArrayType(arg0);
 				ToLua.Push(L, o);
 				return 1;
@@ -1391,7 +725,7 @@ public class System_TypeWrap
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.MakeArrayType");
 			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1403,12 +737,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			System.Type o = obj.MakeByRefType();
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1420,12 +754,12 @@ public class System_TypeWrap
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = (System.Type)ToLua.CheckObject(L, 1, typeof(System.Type));
+			System.Type obj = ToLua.CheckMonoType(L, 1);
 			System.Type o = obj.MakePointerType();
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
@@ -1444,69 +778,94 @@ public class System_TypeWrap
 			ToLua.Push(L, o);
 			return 1;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
 		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int Lua_ToString(IntPtr L)
-	{
-		object obj = ToLua.ToObject(L, 1);
-
-		if (obj != null)
-		{
-			LuaDLL.lua_pushstring(L, obj.ToString());
-		}
-		else
-		{
-			LuaDLL.lua_pushnil(L);
-		}
-
-		return 1;
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_Delimiter(IntPtr L)
 	{
-		LuaDLL.lua_pushnumber(L, System.Type.Delimiter);
-		return 1;
+		try
+		{
+			LuaDLL.lua_pushnumber(L, System.Type.Delimiter);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_EmptyTypes(IntPtr L)
 	{
-		ToLua.Push(L, System.Type.EmptyTypes);
-		return 1;
+		try
+		{
+			ToLua.Push(L, System.Type.EmptyTypes);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_FilterAttribute(IntPtr L)
 	{
-		ToLua.Push(L, System.Type.FilterAttribute);
-		return 1;
+		try
+		{
+			ToLua.Push(L, System.Type.FilterAttribute);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_FilterName(IntPtr L)
 	{
-		ToLua.Push(L, System.Type.FilterName);
-		return 1;
+		try
+		{
+			ToLua.Push(L, System.Type.FilterName);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_FilterNameIgnoreCase(IntPtr L)
 	{
-		ToLua.Push(L, System.Type.FilterNameIgnoreCase);
-		return 1;
+		try
+		{
+			ToLua.Push(L, System.Type.FilterNameIgnoreCase);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_Missing(IntPtr L)
 	{
-		ToLua.Push(L, System.Type.Missing);
-		return 1;
+		try
+		{
+			ToLua.Push(L, System.Type.Missing);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
@@ -1524,7 +883,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Assembly on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Assembly on a nil value");
 		}
 	}
 
@@ -1543,7 +902,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index AssemblyQualifiedName on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index AssemblyQualifiedName on a nil value");
 		}
 	}
 
@@ -1562,7 +921,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Attributes on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Attributes on a nil value");
 		}
 	}
 
@@ -1581,7 +940,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index BaseType on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index BaseType on a nil value");
 		}
 	}
 
@@ -1600,15 +959,22 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index DeclaringType on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index DeclaringType on a nil value");
 		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_DefaultBinder(IntPtr L)
 	{
-		ToLua.PushObject(L, System.Type.DefaultBinder);
-		return 1;
+		try
+		{
+			ToLua.PushObject(L, System.Type.DefaultBinder);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
@@ -1626,7 +992,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index FullName on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index FullName on a nil value");
 		}
 	}
 
@@ -1645,7 +1011,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index GUID on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index GUID on a nil value");
 		}
 	}
 
@@ -1664,7 +1030,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index HasElementType on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index HasElementType on a nil value");
 		}
 	}
 
@@ -1683,7 +1049,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsAbstract on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAbstract on a nil value");
 		}
 	}
 
@@ -1702,7 +1068,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsAnsiClass on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAnsiClass on a nil value");
 		}
 	}
 
@@ -1721,7 +1087,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsArray on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsArray on a nil value");
 		}
 	}
 
@@ -1740,7 +1106,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsAutoClass on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAutoClass on a nil value");
 		}
 	}
 
@@ -1759,7 +1125,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsAutoLayout on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAutoLayout on a nil value");
 		}
 	}
 
@@ -1778,7 +1144,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsByRef on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsByRef on a nil value");
 		}
 	}
 
@@ -1797,7 +1163,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsClass on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsClass on a nil value");
 		}
 	}
 
@@ -1816,7 +1182,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsCOMObject on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsCOMObject on a nil value");
 		}
 	}
 
@@ -1835,7 +1201,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsContextful on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsContextful on a nil value");
 		}
 	}
 
@@ -1854,7 +1220,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsEnum on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsEnum on a nil value");
 		}
 	}
 
@@ -1873,7 +1239,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsExplicitLayout on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsExplicitLayout on a nil value");
 		}
 	}
 
@@ -1892,7 +1258,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsImport on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsImport on a nil value");
 		}
 	}
 
@@ -1911,7 +1277,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsInterface on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsInterface on a nil value");
 		}
 	}
 
@@ -1930,7 +1296,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsLayoutSequential on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsLayoutSequential on a nil value");
 		}
 	}
 
@@ -1949,7 +1315,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsMarshalByRef on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsMarshalByRef on a nil value");
 		}
 	}
 
@@ -1968,7 +1334,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsNestedAssembly on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedAssembly on a nil value");
 		}
 	}
 
@@ -1987,7 +1353,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsNestedFamANDAssem on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedFamANDAssem on a nil value");
 		}
 	}
 
@@ -2006,7 +1372,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsNestedFamily on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedFamily on a nil value");
 		}
 	}
 
@@ -2025,7 +1391,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsNestedFamORAssem on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedFamORAssem on a nil value");
 		}
 	}
 
@@ -2044,7 +1410,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsNestedPrivate on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedPrivate on a nil value");
 		}
 	}
 
@@ -2063,7 +1429,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsNestedPublic on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedPublic on a nil value");
 		}
 	}
 
@@ -2082,7 +1448,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsNotPublic on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNotPublic on a nil value");
 		}
 	}
 
@@ -2101,7 +1467,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsPointer on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsPointer on a nil value");
 		}
 	}
 
@@ -2120,7 +1486,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsPrimitive on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsPrimitive on a nil value");
 		}
 	}
 
@@ -2139,7 +1505,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsPublic on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsPublic on a nil value");
 		}
 	}
 
@@ -2158,7 +1524,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsSealed on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsSealed on a nil value");
 		}
 	}
 
@@ -2177,7 +1543,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsSerializable on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsSerializable on a nil value");
 		}
 	}
 
@@ -2196,7 +1562,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsSpecialName on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsSpecialName on a nil value");
 		}
 	}
 
@@ -2215,7 +1581,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsUnicodeClass on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsUnicodeClass on a nil value");
 		}
 	}
 
@@ -2234,7 +1600,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsValueType on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsValueType on a nil value");
 		}
 	}
 
@@ -2253,7 +1619,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MemberType on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index MemberType on a nil value");
 		}
 	}
 
@@ -2272,7 +1638,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Module on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Module on a nil value");
 		}
 	}
 
@@ -2291,7 +1657,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Namespace on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Namespace on a nil value");
 		}
 	}
 
@@ -2310,7 +1676,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ReflectedType on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index ReflectedType on a nil value");
 		}
 	}
 
@@ -2329,7 +1695,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index TypeHandle on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index TypeHandle on a nil value");
 		}
 	}
 
@@ -2348,7 +1714,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index TypeInitializer on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index TypeInitializer on a nil value");
 		}
 	}
 
@@ -2367,7 +1733,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index UnderlyingSystemType on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index UnderlyingSystemType on a nil value");
 		}
 	}
 
@@ -2386,7 +1752,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ContainsGenericParameters on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index ContainsGenericParameters on a nil value");
 		}
 	}
 
@@ -2405,7 +1771,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsGenericTypeDefinition on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsGenericTypeDefinition on a nil value");
 		}
 	}
 
@@ -2424,7 +1790,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsGenericType on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsGenericType on a nil value");
 		}
 	}
 
@@ -2443,7 +1809,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsGenericParameter on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsGenericParameter on a nil value");
 		}
 	}
 
@@ -2462,7 +1828,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsNested on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNested on a nil value");
 		}
 	}
 
@@ -2481,7 +1847,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsVisible on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsVisible on a nil value");
 		}
 	}
 
@@ -2500,7 +1866,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index GenericParameterPosition on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index GenericParameterPosition on a nil value");
 		}
 	}
 
@@ -2519,7 +1885,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index GenericParameterAttributes on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index GenericParameterAttributes on a nil value");
 		}
 	}
 
@@ -2538,7 +1904,7 @@ public class System_TypeWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index DeclaringMethod on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index DeclaringMethod on a nil value");
 		}
 	}
 
@@ -2552,12 +1918,12 @@ public class System_TypeWrap
 			o = ToLua.ToObject(L, 1);
 			System.Type obj = (System.Type)o;
 			System.Runtime.InteropServices.StructLayoutAttribute ret = obj.StructLayoutAttribute;
-			ToLua.PushObject(L, ret);
+			ToLua.PushSealed(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index StructLayoutAttribute on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index StructLayoutAttribute on a nil value");
 		}
 	}
 }
